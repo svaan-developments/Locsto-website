@@ -1,0 +1,117 @@
+h3{
+  font-size: 24px;
+  font-weight: 600;
+  font-family: 'Inter';
+  line-height: 29px;
+}
+.bg{
+  background-image: url('./assets/Banner.svg');
+}
+.search-container {
+  display: flex;
+  align-items: center;
+  border-radius: 500px;
+  background-color: #FFFFFF;
+  padding: 8px;
+  width: 590px; 
+  border: 1px solid #00000033;
+  position: absolute;
+  left: 345px;
+  top: -25px;
+}
+.search-container-product {
+  display: flex;
+  align-items: center;
+  border-radius: 500px;
+  padding: 8px;
+  width: 463px; 
+  border: 1px solid #FFFFFFB2;
+  color: #FFFFFF;
+}
+
+.search-input {
+  border: none;
+  outline: none;
+  background: none;
+  flex: 1;
+  padding: 8px;
+  border-radius: 20px;
+  font-size: 16px;
+}
+
+.search-icon {
+  color: #888;
+  cursor: pointer;
+}
+
+.search-icon:hover {
+  color: #555;
+}
+
+.bgMobile{
+  display: block !important;
+}
+
+
+@media only screen and (max-width: 768px) {
+  /* Home page */
+  .search-container {
+    width: 360px;
+    left: 26px;
+ }
+
+ .loginMobile{
+  margin: auto;
+  margin-top: 15px;
+  width: 100%;
+  height: 42px;
+ }
+
+ .bgMobile{
+  background-image: url('./assets/BannerMobile.svg');
+}
+
+.bg{
+  display: none;
+}
+
+.bannerMobile{
+  height: 370px;
+}
+
+ /* Product page */
+ .search-container-product {
+  margin: auto;
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  border-radius: 500px;
+  padding: 8px;
+  width: 100%; 
+  border: 1px solid #FFFFFFB2;
+  color: #FFFFFF;
+}
+
+.heightMobile{
+  padding-left: 20px;
+  padding-right: 20px;
+  height: 200px;
+}
+
+.logoLocation{
+  justify-content: space-between;
+}
+
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1280px) {
+  /* Your styles here */
+}
+@media only screen and (min-width: 1280px) and (max-width: 1440px) {
+  /* Your styles here */
+}
+@media only screen and (min-width: 1440px) and (max-width: 1920px) {
+  .bannerMobile{
+    height: 348px;
+  }
+}
