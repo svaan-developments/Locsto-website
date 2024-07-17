@@ -1,86 +1,182 @@
-import React, { useState } from 'react';
-import logo from '../assets/logo.svg'
-import downArrow from '../assets/downArrow.svg'
-import rightArrow from '../assets/rightArrow.svg'
-import { IoSearchOutline } from "react-icons/io5";
-import search from '../assets/search.svg';
-import filter from '../assets/filter.svg';
-import Select from 'react-select';
-import { FaMapMarkerAlt } from 'react-icons/fa';
-import axios from 'axios';
-import NearbyShops from '../assets/NearbyShops.svg';
-import shopArrow from '../assets/shopArrow.svg';
-import TrendingProducts from '../assets/TrendingProducts.svg';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import useNavigate hook
+import logo from "../assets/logo.svg";
+import shopArrow from "../assets/shopArrow.svg";
+import rightArrow from "../assets/rightArrow.svg";
+import downArrow from "../assets/downArrow.svg";
+import search from "../assets/search.svg";
+import filter from "../assets/filter.svg";
+import Select from "react-select";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import location from "../assets/location.svg";
+import { Link } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate(); // Initialize useNavigate hook
+
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [shops, setShops] = useState([]);
+  const [mobileShops, setMobileShops] = useState([]);
+  const [products, setProducts] = useState([]);
 
   const locations = [
-    { value: 'new-york', label: 'New York' },
-    { value: 'los-angeles', label: 'Los Angeles' },
-    { value: 'chicago', label: 'Chicago' },
-    // Add more locations as needed
+    {
+      value: "velachery",
+      label: "Velachery",
+      latitude: 12.9762,
+      longitude: 80.2216,
+    },
+    { value: "omr", label: "OMR", latitude: 12.8434, longitude: 80.1514 },
+    {
+      value: "perungudi",
+      label: "Perungudi",
+      latitude: 12.96,
+      longitude: 80.2394,
+    },
+    { value: "trichy", label: "Trichy", latitude: 10.7905, longitude: 78.7047 },
+    // Add more cities or regions in Tamil Nadu as needed
   ];
 
   const handleSelectChange = (selectedOption) => {
     setSelectedLocation(selectedOption);
+    // Fetch shops for the selected location
+    if (selectedOption) {
+      const selectedLoc = locations.find(
+        (loc) => loc.value === selectedOption.value
+      );
+      fetchShops(selectedLoc.latitude, selectedLoc.longitude);
+    }
+  };
+
+  const handleSearchTextChange = (event) => {
+    setSearchText(event.target.value);
   };
 
   const fetchCurrentLocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        setCurrentLocation({ latitude, longitude });
-        // Optionally, you can fetch the address using a reverse geocoding API
-      }, (error) => {
-        console.error('Error fetching location: ', error);
-      });
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setCurrentLocation({ latitude, longitude });
+          // Trigger fetching shops when location is fetched
+          fetchShops(latitude, longitude);
+        },
+        (error) => {
+          console.error("Error fetching location: ", error);
+        }
+      );
     } else {
-      alert('Geolocation is not supported by this browser.');
+      alert("Geolocation is not supported by this browser.");
     }
   };
 
-  const fetchAddress = async (latitude, longitude) => {
-  const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
-  const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`);
-  if (response.data.results.length > 0) {
-    const address = response.data.results[0].formatted_address;
-    setCurrentLocation({ latitude, longitude, address });
-  }
-};
+  const fetchShops = async (latitude, longitude) => {
+    const payload = {
+      latitude,
+      longitude,
+      kms: 10,
+    };
 
-// Call fetchAddress inside fetchCurrentLocation function
-navigator.geolocation.getCurrentPosition((position) => {
-  const { latitude, longitude } = position.coords;
-  fetchAddress(latitude, longitude);
-}, (error) => {
-  console.error('Error fetching location: ', error);
-});
+    try {
+      const response = await axios.post(
+        "https://erpserver.tazk.in/locstoUser/nearbyshops",
+        payload
+      );
+      setShops(response.data); // Adjust according to the actual response structure
+      // Filter mobile shops
+      const filteredMobileShops = response.data.filter(
+        (shop) => shop.company_type === 1 // Assuming company_type 1 means mobile shops
+      );
+      setMobileShops(filteredMobileShops);
+    } catch (error) {
+      console.error("Error fetching shops: ", error.response || error.message);
+    }
+  };
+
+  const fetchProducts = async (searchText) => {
+    const payload = {
+      latitude: currentLocation?.latitude || 0,
+      longitude: currentLocation?.longitude || 0,
+      brand: searchText,
+      is_new: "",
+    };
+
+    try {
+      const response = await axios.post(
+        "https://erpserver.tazk.in/locstoProduct/searchproducts?page=0&per_page=100",
+        payload
+      );
+      setProducts(response?.data?.data); // Adjust according to the actual response structure
+      console.log(response?.data?.data, "setProducts");
+
+      // Navigate to "/products" route and pass the products data
+      navigate("/products", { state: { products: response?.data?.data } });
+    } catch (error) {
+      console.error(
+        "Error fetching products: ",
+        error.response || error.message
+      );
+    }
+  };
+
+  const fetchTrendingProducts = async () => {
+    try {
+      const response = await axios.get(
+        "https://erpserver.tazk.in/locstoProduct/trending?user_id=&page=0&per_page=100"
+      );
+      // Assuming response.data contains 'data' field with products array
+      setProducts(response.data || []);
+    } catch (error) {
+      console.error(
+        "Error fetching trending products: ",
+        error.response || error.message
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchTrendingProducts();
+  }, []); // Empty dependency array ensures it only runs once on component mount
+
+  const handleSearch = () => {
+    fetchProducts(searchText);
+  };
+
+  // const handleShopClick = (companyId, userId) => {
+  //   navigate(`/companyProfile/${companyId}/${userId || "null"}`);
+  // };
+  const handleShopClick = (companyId, userId) => {
+    const shop = mobileShops.find((shop) => shop.company_id === companyId);
+    if (shop) {
+      navigate(`/shop/${companyId}/${userId}`, { state: { shop } });
+    } else {
+      console.error(
+        `Shop with companyId ${companyId} not found in mobileShops.`
+      );
+    }
+  };
 
   return (
     <>
       <div>
-        <header className="h-[269px] xl:px-24 pt-4 bg bgMobile bg-cover bg-center bg-no-repeat bannerMobile">
-          <div className="flex xl:justify-between items-center">
-            <div className="flex xl:gap-16 items-center">
-              <img src={logo} />
-              <div className='flex items-baseline gap-2'>
-                <div className='text-white text-base font-medium'>Location</div>
-                <img src={downArrow}></img>
-                </div>
+        <header className="h-[269px] xl:px-24 pt-4 bg bg-cover bg-center bg-no-repeat bannerMobile">
+          <div className="flex xl:justify-between items-center headerMobile">
+            <div className="flex xl:gap-16 items-center locationMobile">
+              <img src={logo} alt="Logo" />
               {/* <div>
-                <Select
-                  value={selectedLocation}
-                  onChange={handleSelectChange}
-                  options={locations}
-                  placeholder="Select a location"
-                />
-                <button onClick={fetchCurrentLocation}>
-                  <FaMapMarkerAlt className="bg-white" /> Use Current Location
+                <button
+                  className="flex items-center gap-4 bg-white px-4 py-1 rounded-lg"
+                  onClick={fetchCurrentLocation}
+                  onTouchStart={fetchCurrentLocation} // Add onTouchStart event
+                >
+                  <FaMapMarkerAlt className="bg-white" />
+                  Location
                 </button>
                 {currentLocation && (
-                  <div>
+                  <div className="bg-white">
                     <p>
                       Current Location: {currentLocation.latitude},{" "}
                       {currentLocation.longitude}
@@ -88,11 +184,21 @@ navigator.geolocation.getCurrentPosition((position) => {
                   </div>
                 )}
               </div> */}
+              <div
+                onClick={fetchCurrentLocation}
+                onTouchStart={fetchCurrentLocation}
+                className="flex items-baseline gap-2"
+              >
+                <div className="text-white text-base font-medium">Location</div>
+                <img src={downArrow} alt="Down Arrow" />
+              </div>
             </div>
             <div>
-              <button className="flex justify-center items-center w-[134px] h-[54px] bg-white gap-2 rounded-[100px] loginMobile">
-                <a className="text-base font-semibold uppercase">Login</a>
-                <img src={rightArrow} />
+              <button className="flex justify-center items-center w-[134px] h-[54px] bg-white gap-2 rounded-[100px] homeLogin">
+                <a className="text-base font-semibold uppercase" href="#login">
+                  Login
+                </a>
+                <img src={rightArrow} alt="Right Arrow" />
               </button>
             </div>
           </div>
@@ -100,35 +206,161 @@ navigator.geolocation.getCurrentPosition((position) => {
 
         <div className="relative">
           <div className="search-container">
-            <img src={search} />
+            <img src={search} alt="Search" />
             <input
               type="text"
               className="search-input"
               placeholder="Search here"
+              value={searchText}
+              onChange={handleSearchTextChange}
             />
-            <img src={filter} className="pr-2" />
+            <img
+              src={filter}
+              className="pr-2"
+              alt="Filter"
+              onClick={handleSearch}
+            />
           </div>
-          {/* Nearby Shops */}
-          <section className='xl:px-24 pt-10'>
-            <div className='flex gap-2'>
-            <h3>Nearby Shops</h3>
-            <img className='' src={shopArrow} />
+
+          {/* Display Nearby Shops */}
+          {/* <section className="xl:px-24 pt-10 sectionHeight">
+            <div className="flex gap-2">
+              <h3>Nearby Mobile Shops</h3>
+              <img className="" src={shopArrow} alt="Shop Arrow" />
             </div>
-            <img className='pt-6' src={NearbyShops} />
+            {mobileShops && mobileShops.length > 0 ? (
+              <ul className="shop-list pt-6">
+                {mobileShops.map((shop) => (
+                  <li
+                    key={shop.person_id}
+                    onClick={() =>
+                      handleShopClick(shop.company_id, shop.person_id)
+                    }
+                  >
+                    <div className="shop-item">
+                      {shop.shopImages && shop.shopImages.length > 0 && (
+                        <img
+                          className="shop-image"
+                          src={shop.shopImages[0].img_url}
+                          alt={shop.company_name}
+                        />
+                      )}
+                      <div>
+                        <h4>{shop.company_name}</h4>
+                        <div className="flex items-center gap-2">
+                          <img src={location} alt="Location Icon" />
+                          <p className="text-gray text-[18px] font-normal">
+                            {shop.distance.toFixed(1)} km
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No mobile shops found</p>
+            )}
+          </section> */}
+          <section className="xl:px-24 pt-10 sectionHeight">
+            <div className="flex gap-2">
+              <h3>Nearby Mobile Shops</h3>
+              <img className="" src={shopArrow} alt="Shop Arrow" />
+            </div>
+            {mobileShops && mobileShops.length > 0 ? (
+              <ul className="shop-list pt-6">
+                {mobileShops.map((shop) => (
+                  <li
+                    key={shop.person_id}
+                    onClick={() =>
+                      handleShopClick(shop.company_id, shop.person_id)
+                    }
+                  >
+                    <div className="shop-item">
+                      {shop.shopImages && shop.shopImages.length > 0 && (
+                        <img
+                          className="shop-image"
+                          src={shop.shopImages[0].img_url}
+                          alt={shop.company_name}
+                        />
+                      )}
+                      <div>
+                        <h4>{shop.company_name}</h4>
+                        <div className="flex items-center gap-2">
+                          <img src={location} alt="Location Icon" />
+                          <p className="text-gray text-[18px] font-normal">
+                            {shop.distance.toFixed(1)} km
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No mobile shops found</p>
+            )}
           </section>
 
-          {/* Trending Products */}
-          <section className='xl:px-24 pt-10'>
-            <div className='flex gap-2'>
-            <h3>Trending Products</h3>
-            <img className='' src={shopArrow} />
+          {/* Display Trending Products */}
+          <section className="xl:px-24 pt-6 sectionHeight">
+            <div className="flex gap-2">
+              <h3>Trending Products</h3>
+              <img className="" src={shopArrow} alt="Trending Products Arrow" />
             </div>
-            <img className='pt-6' src={TrendingProducts} />
+            <div className="product-container horizontal-scroll pt-6">
+              {products && products.length > 0 ? (
+                <ul className="Trending-product-list">
+                  {products.map((product) => (
+                    <li key={product.id} className="product-item">
+                      <div>
+                        <div className="product-images">
+                          {product.product_images &&
+                          product.product_images.length > 0 ? (
+                            product.product_images.map((image, index) => {
+                              // Only render the first image
+                              if (index === 0) {
+                                return (
+                                  <Link
+                                    to={`/product/${product.id}`}
+                                    state={{ product }} // Pass the product data as state
+                                    key={index}
+                                  >
+                                    <img
+                                      className="product-thumbnail"
+                                      src={product.product_images[0].img_url}
+                                      alt={product.product_images[0].type}
+                                      width={66}
+                                      height={66}
+                                    />
+                                  </Link>
+                                );
+                              }
+                              return null; // Don't render other images
+                            })
+                          ) : (
+                            <p>No images available</p>
+                          )}
+                        </div>
+                        <h4 className="text-secondary font-medium text-[18px] py-2 flex-wrap w-[190px]">
+                          {product.name}
+                        </h4>
+                        <p className="text-secondary font-bold text-[20px]">
+                          Rs. {product.unit_price}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No trending products found</p>
+              )}
+            </div>
           </section>
         </div>
       </div>
     </>
   );
-}
+};
 
-export default Home
+export default Home;

@@ -1,19 +1,25 @@
-h3{
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+
+body {
+  font-family: "Inter";
+}
+
+h3 {
   font-size: 24px;
   font-weight: 600;
-  font-family: 'Inter';
+  font-family: "Inter";
   line-height: 29px;
 }
-.bg{
-  background-image: url('./assets/Banner.svg');
+.bg {
+  background-image: url("./assets/Banner.svg");
 }
 .search-container {
   display: flex;
   align-items: center;
   border-radius: 500px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   padding: 8px;
-  width: 590px; 
+  width: 590px;
   border: 1px solid #00000033;
   position: absolute;
   left: 345px;
@@ -24,9 +30,9 @@ h3{
   align-items: center;
   border-radius: 500px;
   padding: 8px;
-  width: 463px; 
-  border: 1px solid #FFFFFFB2;
-  color: #FFFFFF;
+  width: 463px;
+  border: 1px solid #ffffffb2;
+  color: #ffffff;
 }
 
 .search-input {
@@ -48,60 +54,221 @@ h3{
   color: #555;
 }
 
-.bgMobile{
-  display: block !important;
+.product-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px; /* Adjust the gap between items as needed */
+  padding: 0;
+  list-style-type: none;
 }
 
+.product-item {
+  flex: 1 1 calc(20% - 16px); /* Adjust the width and gap between items */
+  box-sizing: border-box;
+  margin-bottom: 30px;
+  /* background: #ededed;
+  padding: 10px;
+  border-radius: 16px; */
+}
+
+.custom-gallery .image-gallery-slide img {
+  width: 100%;
+  height: auto;
+  max-height: 100px;
+}
+
+.custom-gallery .image-gallery-thumbnail img {
+  width: 100px; /* Adjust the thumbnail width */
+  height: auto; /* Maintain the aspect ratio */
+  max-height: 100px; /* Adjust the max height for thumbnails */
+}
+
+.image-gallery-left-nav,
+.image-gallery-right-nav {
+  padding: 50px 10px;
+  top: 50%;
+  transform: translateY(-25%) !important;
+}
+
+.image-gallery-left-nav .image-gallery-svg,
+.image-gallery-right-nav .image-gallery-svg {
+  height: 35px !important;
+  width: 25px !important;
+}
+
+.image-gallery-fullscreen-button,
+.image-gallery-play-button {
+  bottom: 0;
+  padding: 0px !important;
+}
+
+.product-thumbnail {
+  width: 190px;
+  /* max-width: 100%; */
+  height: 180px;
+  background: #ededed;
+  padding: 10px;
+  border-radius: 16px;
+}
+
+.shop-list {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.shop-list::-webkit-scrollbar {
+  /* WebKit */
+  width: 0;
+  height: 0;
+}
+
+.shop-item {
+  flex: 0 0 auto; /* Ensure items don't shrink */
+  margin-right: 1rem; /* Add some spacing between items */
+  display: flex;
+  gap: 10px;
+  width: 268px;
+  /* height: 66px; */
+  word-break: break-word;
+}
+
+.shop-image {
+  width: 66px;
+  height: 66px;
+  object-fit: cover;
+  border-radius: 50%; /* Optional: to give images rounded corners */
+}
+
+/* Trending Product */
+
+.product-container {
+  overflow-x: auto;
+  display: flex;
+  flex-direction: row;
+  -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+}
+
+.product-list {
+  display: flex;
+  flex-direction: row;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.product-item {
+  flex: 0 0 auto;
+  margin-right: 10px; /* Adjust margin as needed */
+}
+
+.product-images {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-direction: row;
+}
+
+.product-image {
+  width: 66px;
+  height: 66px;
+  object-fit: cover;
+  margin-right: 10px; /* Adjust margin as needed */
+}
+
+/* Hide scrollbar for Webkit browsers (Chrome, Safari) */
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge, and Firefox */
+.horizontal-scroll {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Enable horizontal scrolling */
+.horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+
+.Trending-product-list {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.product-item {
+  flex: 0 0 auto; /* Prevent flex items from shrinking or growing */
+  margin-right: 10px; /* Adjust spacing between items as needed */
+}
+
+.image-gallery-content .image-gallery-slide .image-gallery-image {
+  max-height: calc(60vh - 80px) !important;
+}
 
 @media only screen and (max-width: 768px) {
   /* Home page */
   .search-container {
     width: 360px;
     left: 26px;
- }
+  }
 
- .loginMobile{
-  margin: auto;
-  margin-top: 15px;
-  width: 100%;
-  height: 42px;
- }
+  .loginMobile {
+    margin: auto;
+    margin-top: 15px;
+    width: 100%;
+    height: 42px;
+  }
 
- .bgMobile{
-  background-image: url('./assets/BannerMobile.svg');
-}
+  /* Product page */
+  .search-container-product {
+    margin: auto;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    border-radius: 500px;
+    padding: 8px;
+    width: 100%;
+    border: 1px solid #ffffffb2;
+    color: #ffffff;
+  }
 
-.bg{
-  display: none;
-}
+  .heightMobile {
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 200px;
+  }
 
-.bannerMobile{
-  height: 370px;
-}
-
- /* Product page */
- .search-container-product {
-  margin: auto;
-  margin-top: 15px;
-  display: flex;
-  align-items: center;
-  border-radius: 500px;
-  padding: 8px;
-  width: 100%; 
-  border: 1px solid #FFFFFFB2;
-  color: #FFFFFF;
-}
-
-.heightMobile{
-  padding-left: 20px;
-  padding-right: 20px;
-  height: 200px;
-}
-
-.logoLocation{
-  justify-content: space-between;
-}
-
+  .logoLocation {
+    justify-content: space-between;
+  }
+  .bg {
+    background-image: url("./assets/BannerMobile.svg");
+  }
+  .bannerMobile {
+    height: 348px;
+  }
+  .headerMobile {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .locationMobile {
+    gap: 20px;
+  }
+  .homeLogin {
+    width: 102px;
+    height: 48px;
+  }
+  .sectionHeight {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1280px) {
@@ -111,7 +278,7 @@ h3{
   /* Your styles here */
 }
 @media only screen and (min-width: 1440px) and (max-width: 1920px) {
-  .bannerMobile{
+  .bannerMobile {
     height: 348px;
   }
 }
