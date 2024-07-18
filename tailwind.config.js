@@ -8,9 +8,8 @@ module.exports = {
         secondary: "#343434",
         gray: "#7A7A7A",
         Neutral: "#312234",
-
+        block: "#1C1C1E",
         white: "#ffffff",
-        // green: "(146.73deg, #42E165 18.69%, #00800D 80.92%)",
       },
       flexBasis: {
         50: "50%",

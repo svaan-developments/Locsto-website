@@ -10,7 +10,7 @@ const Product = () => {
   const [searchText, setSearchText] = useState("");
   const location = useLocation();
   const products = location.state?.products || [];
-
+  console.log(products, "products list");
   const handleInputChange = (event) => {
     setSearchText(event.target.value);
   };
@@ -79,7 +79,10 @@ const Product = () => {
             <ul className="product-list">
               {products.map((product) => (
                 <li key={product.item_id} className="product-item">
-                  <Link to={`/product/${product.item_id}`} state={{ product }}>
+                  <Link
+                    to={`/product/${product.item_id}`}
+                    state={{ product, products }}
+                  >
                     {product.product_images &&
                     product.product_images.length > 0 ? (
                       <img

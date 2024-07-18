@@ -9,47 +9,42 @@ import rightArrow from "../assets/rightArrow.svg";
 const ShopDetails = () => {
   const [searchText, setSearchText] = useState("");
   const location = useLocation();
-  const { shop } = location.state;
+  const { shop } = location.state || {};
   const [products, setProducts] = useState([]);
-  const [loadingProducts, setLoadingProducts] = useState(true);
-  const [errorProducts, setErrorProducts] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const handleInputChange = (event) => {
     setSearchText(event.target.value);
   };
 
-  useEffect(() => {
-    const fetchShopProducts = async (userId) => {
-      try {
-        if (!userId) {
-          throw new Error("User ID is undefined or null.");
+  const fetchShopProducts = async (companyId) => {
+    try {
+      const response = await axios.post(
+        `https://erpserver.tazk.in/locstoProduct/items/6?page=0&per_page=100`,
+        {
+          categories: ["SMARTPHONE"],
         }
+      );
+      console.log("Shop Products Response:", response.data.data);
+      setProducts(response.data.data || []); // Ensure to set an empty array if response.data.data is undefined
+      setLoading(false);
+    } catch (error) {
+      console.error(
+        "Error fetching shop products: ",
+        error.response || error.message
+      );
+      setError("Error fetching shop products. Please try again later.");
+      setLoading(false);
+    }
+  };
 
-        const response = await axios.post(
-          `https://erpserver.tazk.in/locstoProduct/items/${userId}?page=0&per_page=100`,
-          {} // Add empty object as second argument if no data to send
-        );
-
-        console.log("Shop Products Response:", response.data);
-        setProducts(response.data || []);
-        setLoadingProducts(false);
-      } catch (error) {
-        console.error(
-          "Error fetching shop products: ",
-          error.response || error.message
-        );
-        setErrorProducts(
-          "Error fetching shop products. Please try again later."
-        );
-        setLoadingProducts(false);
-      }
-    };
-
-    if (shop && shop.user_id) {
-      fetchShopProducts(shop.user_id);
+  useEffect(() => {
+    if (shop && shop.company_id) {
+      fetchShopProducts(shop.company_id); // Fetch products when shop details are available
     } else {
-      setErrorProducts("Shop information is not available.");
-      setLoadingProducts(false);
+      setError("Shop information is not available.");
+      setLoading(false);
     }
   }, [shop]);
 
@@ -89,10 +84,10 @@ const ShopDetails = () => {
 
       <section>
         <div>
-          {shop.shopImages.length > 0 && (
+          {shop.shopImages && shop.shopImages.length > 0 && (
             <img
               src={shop.shopImages[0].img_url}
-              alt={`Shop Image 1`}
+              alt="Shop Image 1"
               style={{ width: "100%", height: "300px" }}
             />
           )}
@@ -122,20 +117,50 @@ const ShopDetails = () => {
       <section>
         <div>
           <h3>Shop Products:</h3>
-          {loadingProducts ? (
+          {loading ? (
             <div>Loading shop products...</div>
-          ) : errorProducts ? (
-            <div>{errorProducts}</div>
-          ) : (
+          ) : error ? (
+            <div>{error}</div>
+          ) : products && products.length > 0 ? (
             <ul>
               {products.map((product) => (
-                <li key={product.id}>
+                <li key={product.item_id}>
                   <h4>{product.name}</h4>
+                  <p>Brand: {product.brand}</p>
+                  <p>Category: {product.category}</p>
                   <p>Price: Rs. {product.unit_price}</p>
-                  {/* Add more product details as needed */}
+                  <p>Cost Price: Rs. {product.cost_price}</p>
+                  <p>Max Price: Rs. {product.max_price}</p>
+                  <p>Quantity: {product.quantity}</p>
+                  <p>Is New: {product.is_new ? "Yes" : "No"}</p>
+                  <p>Bookmark: {product.bookmark ? "Yes" : "No"}</p>
+                  <p>Shop Type: {product.shop_type}</p>
+                  <p>Creation Date: {product.creationDate}</p>
+                  <p>Last Updated: {product.itemUpdated}</p>
+                  <p>Description: {product.descript}</p>
+                  <p>Variant: {product.variant || "N/A"}</p>
+                  <p>Color: {product.color || "N/A"}</p>
+                  <div>
+                    {product.product_images &&
+                    product.product_images.length > 0 ? (
+                      product.product_images.map((image, index) => (
+                        <img
+                          key={index}
+                          src={image.img_url}
+                          alt={image.type}
+                          width={66}
+                          height={66}
+                        />
+                      ))
+                    ) : (
+                      <p>No images available</p>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
+          ) : (
+            <div>No products available</div>
           )}
         </div>
       </section>

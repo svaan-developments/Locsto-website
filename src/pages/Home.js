@@ -21,6 +21,9 @@ const Home = () => {
   const [shops, setShops] = useState([]);
   const [mobileShops, setMobileShops] = useState([]);
   const [products, setProducts] = useState([]);
+  console.log(products, "products");
+  const [loading, setLoading] = useState(false); // Add loading state
+  const [error, setError] = useState(null); // Add error state
 
   const locations = [
     {
@@ -146,18 +149,59 @@ const Home = () => {
   };
 
   // const handleShopClick = (companyId, userId) => {
-  //   navigate(`/companyProfile/${companyId}/${userId || "null"}`);
+  //   const shop = mobileShops.find((shop) => shop.company_id === companyId);
+  //   if (shop) {
+  //     navigate(`/shop/${companyId}/${userId}`, { state: { shop } });
+  //   } else {
+  //     console.error(
+  //       `Shop with companyId ${companyId} not found in mobileShops.`
+  //     );
+  //   }
   // };
   const handleShopClick = (companyId, userId) => {
     const shop = mobileShops.find((shop) => shop.company_id === companyId);
     if (shop) {
+      // Navigate to shop details page and pass shop object as state
       navigate(`/shop/${companyId}/${userId}`, { state: { shop } });
+
+      // Fetch products for the selected shop
+      fetchShopProducts(companyId); // Define this function to fetch products
     } else {
       console.error(
         `Shop with companyId ${companyId} not found in mobileShops.`
       );
     }
   };
+
+  const fetchShopProducts = async (companyId) => {
+    try {
+      const response = await axios.post(
+        `https://erpserver.tazk.in/locstoProduct/items/${companyId}?page=0&per_page=100`,
+        {
+          categories: ["SMARTPHONE"],
+        }
+      );
+      console.log("Shop Products Response:", response.data.data);
+      setProducts(response.data.data || []); // Ensure to set an empty array if response.data.data is undefined
+      setLoading(false);
+    } catch (error) {
+      console.error(
+        "Error fetching shop products: ",
+        error.response || error.message
+      );
+      setError("Error fetching shop products. Please try again later.");
+      setLoading(false);
+    }
+  };
+
+  // useEffect(() => {
+  //   if (shop && shop.company_id) {
+  //     fetchShopProducts(shop.company_id); // Fetch products when shop details are available
+  //   } else {
+  //     setError("Shop information is not available.");
+  //     setLoading(false);
+  //   }
+  // }, [shop]);
 
   return (
     <>
@@ -187,7 +231,7 @@ const Home = () => {
               <div
                 onClick={fetchCurrentLocation}
                 onTouchStart={fetchCurrentLocation}
-                className="flex items-baseline gap-2"
+                className="flex items-baseline gap-2 cursor-pointer"
               >
                 <div className="text-white text-base font-medium">Location</div>
                 <img src={downArrow} alt="Down Arrow" />
