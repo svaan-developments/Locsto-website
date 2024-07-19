@@ -90,7 +90,7 @@ const ProductDetails = () => {
             />
             <img src={searchIcon} alt="Search Icon" />
           </div>
-          <div className="loginPadding">
+          <div>
             <button className="flex justify-center items-center w-[134px] h-[54px] bg-white gap-2 rounded-[100px] loginMobile">
               <a className="text-base font-semibold uppercase">Login</a>
               <img src={rightArrow} alt="Right Arrow" />
@@ -128,7 +128,7 @@ const ProductDetails = () => {
         </div>
       </section>
 
-      <section className="xl:px-24 pt-10 sectionHeight">
+      {/* <section className="xl:px-24 pt-10 sectionHeight">
         <div className="flex gap-2">
           <h3>Available Shops</h3>
           <img className="" src={shopArrow} alt="Shop Arrow" />
@@ -159,8 +159,6 @@ const ProductDetails = () => {
                 </div>
                 <p>{item.name}</p>
                 <p>{item.address}</p>
-                {/* <img src={whatsapp} /> */}
-                {/* WhatsApp link */}
                 <div className="flex items-center gap-4 pt-2 w-[280px]">
                   <img className="" src={messageBTN} alt="callBTN" />
                   <a
@@ -174,13 +172,12 @@ const ProductDetails = () => {
                     <img className="" src={callBTN} alt="callBTN" />
                     <p className="text-white">Call</p>
                   </button>
-                  {/* <img className="" src={callBTN} alt="callBTN" /> */}
                 </div>
               </div>
             </li>
           ))}
         </ul>
-      </section>
+      </section> */}
     </>
   );
 };

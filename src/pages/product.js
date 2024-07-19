@@ -61,7 +61,7 @@ const Product = () => {
               />
               <img src={searchIcon} alt="Search Icon" />
             </div>
-            <div>
+            <div className="loginPadding">
               <button className="flex justify-center items-center w-[134px] h-[54px] bg-white gap-2 rounded-[100px] loginMobile">
                 <a className="text-base font-semibold uppercase">Login</a>
                 <img src={rightArrow} alt="Right Arrow" />

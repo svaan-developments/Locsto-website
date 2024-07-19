@@ -163,9 +163,6 @@ const Home = () => {
     if (shop) {
       // Navigate to shop details page and pass shop object as state
       navigate(`/shop/${companyId}/${userId}`, { state: { shop } });
-
-      // Fetch products for the selected shop
-      fetchShopProducts(companyId); // Define this function to fetch products
     } else {
       console.error(
         `Shop with companyId ${companyId} not found in mobileShops.`
@@ -237,7 +234,7 @@ const Home = () => {
                 <img src={downArrow} alt="Down Arrow" />
               </div>
             </div>
-            <div>
+            <div className="loginPadding">
               <button className="flex justify-center items-center w-[134px] h-[54px] bg-white gap-2 rounded-[100px] homeLogin">
                 <a className="text-base font-semibold uppercase" href="#login">
                   Login
@@ -248,7 +245,7 @@ const Home = () => {
           </div>
         </header>
 
-        <div className="relative">
+        <div className="">
           <div className="search-container">
             <img src={search} alt="Search" />
             <input
@@ -367,7 +364,7 @@ const Home = () => {
                                 return (
                                   <Link
                                     to={`/product/${product.id}`}
-                                    state={{ product }} // Pass the product data as state
+                                    state={{ product, products }} // Pass the products data as state
                                     key={index}
                                   >
                                     <img
