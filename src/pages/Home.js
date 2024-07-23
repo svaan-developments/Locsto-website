@@ -151,6 +151,7 @@ const Home = () => {
   // const handleShopClick = (companyId, userId) => {
   //   const shop = mobileShops.find((shop) => shop.company_id === companyId);
   //   if (shop) {
+  //     // Navigate to shop details page and pass shop object as state
   //     navigate(`/shop/${companyId}/${userId}`, { state: { shop } });
   //   } else {
   //     console.error(
@@ -158,15 +159,38 @@ const Home = () => {
   //     );
   //   }
   // };
-  const handleShopClick = (companyId, userId) => {
-    const shop = mobileShops.find((shop) => shop.company_id === companyId);
-    if (shop) {
-      // Navigate to shop details page and pass shop object as state
-      navigate(`/shop/${companyId}/${userId}`, { state: { shop } });
-    } else {
-      console.error(
-        `Shop with companyId ${companyId} not found in mobileShops.`
+
+  const handleShopClick = async (companyId, personId) => {
+    try {
+      const response = await axios.post(
+        `https://erpserver.tazk.in/locstoUser/companyProfile/${companyId}/${personId}`,
+        {
+          latitude: 12.001,
+          longitude: 14.001,
+        }
       );
+      console.log("Shop Profile Response:", response?.data); // Log the response data
+
+      if (response?.data) {
+        // Ensure company_id is included in the shopProfile
+        navigate(`/shopProfile/${companyId}/${personId}`, {
+          state: {
+            shopProfile: {
+              ...response.data,
+              company_id: companyId,
+              personId: personId,
+            },
+          },
+        });
+      } else {
+        console.error("No data received from the API.");
+      }
+    } catch (error) {
+      console.error(
+        "Error fetching shop profile: ",
+        error.response || error.message
+      );
+      setError("Error fetching shop profile. Please try again later.");
     }
   };
 
@@ -263,46 +287,6 @@ const Home = () => {
             />
           </div>
 
-          {/* Display Nearby Shops */}
-          {/* <section className="xl:px-24 pt-10 sectionHeight">
-            <div className="flex gap-2">
-              <h3>Nearby Mobile Shops</h3>
-              <img className="" src={shopArrow} alt="Shop Arrow" />
-            </div>
-            {mobileShops && mobileShops.length > 0 ? (
-              <ul className="shop-list pt-6">
-                {mobileShops.map((shop) => (
-                  <li
-                    key={shop.person_id}
-                    onClick={() =>
-                      handleShopClick(shop.company_id, shop.person_id)
-                    }
-                  >
-                    <div className="shop-item">
-                      {shop.shopImages && shop.shopImages.length > 0 && (
-                        <img
-                          className="shop-image"
-                          src={shop.shopImages[0].img_url}
-                          alt={shop.company_name}
-                        />
-                      )}
-                      <div>
-                        <h4>{shop.company_name}</h4>
-                        <div className="flex items-center gap-2">
-                          <img src={location} alt="Location Icon" />
-                          <p className="text-gray text-[18px] font-normal">
-                            {shop.distance.toFixed(1)} km
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No mobile shops found</p>
-            )}
-          </section> */}
           <section className="xl:px-24 pt-10 sectionHeight">
             <div className="flex gap-2">
               <h3>Nearby Mobile Shops</h3>
@@ -310,7 +294,7 @@ const Home = () => {
             </div>
             {mobileShops && mobileShops.length > 0 ? (
               <ul className="shop-list pt-6">
-                {mobileShops.map((shop) => (
+                {shops.map((shop) => (
                   <li
                     key={shop.person_id}
                     onClick={() =>

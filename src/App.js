@@ -17,7 +17,16 @@ function App() {
             {/* <Route path={ROUTES.PRODUCTDETAILS} element={<ProductDetails />} /> */}
             {/* <Route path={ROUTES.MOBILEDETAILS} element={MobileDetails} /> */}
             <Route path="/product/:id" element={<ProductDetails />} />
-            <Route path="/shop/:companyId/:userId" element={<ShopProfile />} />
+            {/* <Route path="/shop/:companyId/:userId" element={<ShopProfile />} /> */}
+            {/* <Route
+              path="/shopProfile/:companyId/:personId"
+              element={<ShopProfile />}
+            /> */}
+            <Route
+              path="/shopProfile/:companyId/:personId"
+              element={<ShopProfile />}
+            />
+
             <Route
               path="/product/:productId"
               element={<ShopProductDetails />}

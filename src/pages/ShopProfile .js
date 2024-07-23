@@ -1,26 +1,65 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import downArrow from "../assets/downArrow.svg";
 import searchIcon from "../assets/search.svg";
 import rightArrow from "../assets/rightArrow.svg";
 import shopArrow from "../assets/shopArrow.svg";
-import { useNavigate } from "react-router-dom"; // Import useNavigate hook
 import AddressIcon from "../assets/addressIcon.svg";
+import Member from "../assets/memberIcon.svg";
+import Follow from "../assets/FollowIcon.svg";
+import Followers from "../assets/FollowersIcon.svg";
+import Google from "../assets/google.svg";
+import Gmail from "../assets/Gmail.svg";
+import WhatsappIcon from "../assets/whatsappIcon.svg";
 
-const ShopDetails = () => {
+const ShopProfile = () => {
   const [searchText, setSearchText] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
   const location = useLocation();
-  const { shop } = location.state || {};
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [shopProfile, setShopProfile] = useState([]);
+  console.log(shopProfile, "shopProfile");
 
-  const userId = 157; // Replace with the actual user ID
-  const companyId = shop.company_id; // Adjust as per your data structure
+  const userId = 157;
+  const companyId = shopProfile?.company_id;
+
+  useEffect(() => {
+    if (location.state?.shopProfile) {
+      setShopProfile(location.state.shopProfile);
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    const fetchShopProducts = async () => {
+      if (companyId) {
+        try {
+          const response = await axios.post(
+            `https://erpserver.tazk.in/locstoProduct/items/${companyId}?page=0&per_page=100`,
+            {
+              categories: ["SMARTPHONE"],
+            }
+          );
+          setProducts(response.data || []);
+        } catch (error) {
+          setError("Error fetching shop products. Please try again later.");
+        } finally {
+          setLoading(false);
+        }
+      }
+      // else {
+      //   setError("Shop information is not available.");
+      //   setLoading(false);
+      // }
+    };
+
+    fetchShopProducts();
+  }, [companyId]);
 
   const handleInputChange = (event) => {
     setSearchText(event.target.value);
@@ -38,53 +77,37 @@ const ShopDetails = () => {
           followed_id: companyId,
         }
       );
-      console.log("Follow response:", response.data);
       setIsFollowing(true);
     } catch (error) {
-      console.error("Error following:", error.response || error.message);
       setError("Failed to follow. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchShopProducts = async (companyId) => {
-    try {
-      const response = await axios.post(
-        `https://erpserver.tazk.in/locstoProduct/items/${companyId}?page=0&per_page=100`,
-        {
-          categories: ["SMARTPHONE"],
-        }
-      );
-      console.log("Shop Products Response", response.data);
-      setProducts(response.data || []); // Ensure to set an empty array if response.data.data is undefined
-      setLoading(false);
-    } catch (error) {
-      console.error(
-        "Error fetching shop products: ",
-        error.response || error.message
-      );
-      setError("Error fetching shop products. Please try again later.");
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (shop && shop.company_id) {
-      fetchShopProducts(shop.company_id); // Fetch products when shop details are available
-    } else {
-      setError("Shop information is not available.");
-      setLoading(false);
-    }
-  }, [shop]);
-
-  if (!shop) {
-    return <div>Loading...</div>;
-  }
-
   const handleProductClick = (product) => {
     navigate(`/product/${product.item_id}`, { state: { product, products } });
   };
+
+  const handleToggle = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const truncateText = (text, limit) => {
+    if (typeof text !== "string") {
+      return "";
+    }
+    if (text.length <= limit) {
+      return text;
+    }
+    return text.substring(0, limit) + "...";
+  };
+
+  const addressLimit = 30;
+
+  if (!shopProfile) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
@@ -117,11 +140,27 @@ const ShopDetails = () => {
       </header>
 
       <section>
-        <div>
-          {shop.shopImages && shop.shopImages.length > 0 && (
+        {/* <div>
+          {shopProfile?.shopImages?.length > 0 && (
             <img
-              src={shop.shopImages[0].img_url}
-              alt="Shop Image 1"
+              src={shopProfile[0]?.shopImages.img_url}
+              alt="Shop Image"
+              style={{
+                width: "100%",
+                height: "300px",
+                backgroundSize: "cover",
+                objectFit: "fill",
+              }}
+            />
+          )}
+        </div> */}
+
+        <div className="">
+          {shopProfile[0]?.shopImages?.length > 0 && (
+            <img
+              src={shopProfile[0].shopImages[0].img_url}
+              alt={shopProfile[0].shopImages[0].img_name}
+              // className={shopProfile[0].shopImages[0].thumbnail ? "thumbnail-class" : "regular-class"}
               style={{
                 width: "100%",
                 height: "300px",
@@ -131,40 +170,56 @@ const ShopDetails = () => {
             />
           )}
         </div>
-        {/* <div className="boxShadow">
-          <h2 className="text-[24px] text-primary font-semibold">
-            {shop.company_name}
-          </h2>
-          <div>
-            <p>Phone Number: {shop.phone_number}</p>
-            {shop.bussiness_whatsapp_number && (
-              <p>WhatsApp Number: {shop.bussiness_whatsapp_number}</p>
-            )}
-            <p>Address: {shop.address}</p>
-            {shop.area && <p>Area: {shop.area}</p>}
-          </div>
-        </div> */}
+
         <div className="relative">
-          {/* <img className="w-full h-auto" src={shopImageUrl} alt="Shop Image" /> */}
-          <div className="flex gap-10 boxShadow absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded-md shadow-lg">
+          <div className="xl:flex items-center justify-between gap-10 boxShadow absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded-md shadow-lg">
             <div>
-              {" "}
-              <h2 className="text-[24px] text-primary font-semibold">
-                {shop.company_name}
-              </h2>
-              <div>
-                <p>Phone Number: {shop.phone_number}</p>
-                {shop.bussiness_whatsapp_number && (
-                  <p>WhatsApp Number: {shop.bussiness_whatsapp_number}</p>
-                )}
-                <div className="flex gap-2 text-[#828282]">
-                  <img src={AddressIcon} />
-                  <p>{shop.address}</p>
+              <p className="">{shopProfile[0]?.company_name}</p>
+              {/* <p className="">{shopProfile[0]?.address}</p> */}
+              <div className="flex gap-2">
+                <img src={Member} />
+                <p>Member since Dec 2023</p>
+              </div>
+              <div className="flex gap-6 pt-4">
+                <div className="flex gap-2">
+                  <img src={Followers} />
+                  <p>216 Followers</p>
                 </div>
-                {shop.area && <p>Area: {shop.area}</p>}
+                <div className="flex gap-2">
+                  <img src={Follow} />
+                  <p>24 Following</p>
+                </div>
+              </div>
+              <div>
+                <div className="flex gap-2 text-[#828282] pt-2">
+                  <img src={AddressIcon} alt="Address Icon" />
+                  <p>
+                    {isExpanded
+                      ? shopProfile?.address
+                      : truncateText(shopProfile[0]?.address, addressLimit)}
+                    {shopProfile?.address?.length > addressLimit && (
+                      <span
+                        onClick={handleToggle}
+                        className="text-blue-500 cursor-pointer"
+                      >
+                        {isExpanded ? " Show less" : " Show more"}
+                      </span>
+                    )}
+                  </p>
+                </div>
+                {shopProfile?.near_location && (
+                  <p>Near: {shopProfile.near_location}</p>
+                )}
               </div>
             </div>
-            <div></div>
+            <div>
+              <p>User verified with you</p>
+              <div className="flex gap-4">
+                <img src={Google} />
+                <img src={Gmail} />
+                <img src={WhatsappIcon} />
+              </div>
+            </div>
             <div>
               <button
                 onClick={handleFollow}
@@ -183,7 +238,7 @@ const ShopDetails = () => {
         </div>
       </section>
 
-      <section className="xl:px-24 py-20 sectionHeight sectionPadding">
+      <section className="xl:px-24 pt-28 pb-10 sectionHeight sectionPadding">
         <div>
           <div className="flex gap-2">
             <h3>Products</h3>
@@ -193,7 +248,7 @@ const ShopDetails = () => {
             <div>Loading shop products...</div>
           ) : error ? (
             <div>{error}</div>
-          ) : products && products.length > 0 ? (
+          ) : products?.length > 0 ? (
             <ul className="product-list-container pt-6">
               {products.map((product) => (
                 <li
@@ -201,14 +256,13 @@ const ShopDetails = () => {
                   onClick={() => handleProductClick(product)}
                 >
                   <div>
-                    {product.product_images &&
-                      product.product_images.length > 0 && (
-                        <img
-                          src={product.product_images[0].img_url}
-                          alt={product.name}
-                          className=""
-                        />
-                      )}
+                    {product.product_images?.length > 0 && (
+                      <img
+                        src={product.product_images[0]?.img_url}
+                        alt={product.name}
+                        className=""
+                      />
+                    )}
                   </div>
                   <div>
                     <h4 className="text-secondary font-semibold text-[18px]">
@@ -218,7 +272,6 @@ const ShopDetails = () => {
                     <p className="text-secondary font-bold text-[20px]">
                       Price: Rs. {product.unit_price}
                     </p>
-                    {/* <p>Is New: {product.is_new ? "Yes" : "No"}</p> */}
                   </div>
                 </li>
               ))}
@@ -232,4 +285,4 @@ const ShopDetails = () => {
   );
 };
 
-export default ShopDetails;
+export default ShopProfile;

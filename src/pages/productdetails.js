@@ -12,9 +12,11 @@ import carKM from "../assets/car.svg";
 import whatsapp from "../assets/whatsapp.svg";
 import callBTN from "../assets/call_Icon.svg";
 import messageBTN from "../assets/message_Icon.svg";
+import { useNavigate } from "react-router-dom";
 
 const ProductDetails = () => {
   const location = useLocation();
+  const navigate = useNavigate(); // Initialize useNavigate hook
   const { product, products } = location.state || {};
 
   console.log(products, "products detail search based");
@@ -59,7 +61,7 @@ const ProductDetails = () => {
     }));
   };
 
-  const phoneNumber = "8754770098";
+  const phoneNumber = product.bussiness_whatsapp_number;
 
   const isMobileDevice = () => {
     return /Mobi|Android/i.test(navigator.userAgent);
@@ -68,6 +70,15 @@ const ProductDetails = () => {
   const whatsappUrl = isMobileDevice()
     ? `https://wa.me/${phoneNumber}`
     : `https://web.whatsapp.com/send?phone=${phoneNumber}`;
+
+  const handleShopClick = (companyId, userId) => {
+    const shop = products.find((shop) => shop.company_id === companyId);
+    if (shop) {
+      navigate(`/shop/${companyId}/${userId}`, { state: { shop } });
+    } else {
+      console.error(`Shop with companyId ${companyId} not found in products.`);
+    }
+  };
 
   return (
     <>
@@ -135,7 +146,11 @@ const ProductDetails = () => {
         </div>
         <ul className="product-list-shops mt-10">
           {products.map((item, index) => (
-            <li key={index} className="product-item-shops">
+            <li
+              key={item.person_id} // Use unique key
+              onClick={() => handleShopClick(item.company_id, item.person_id)}
+              className="product-item-shops"
+            >
               <div className="product-image-shops">
                 {item.shopImages && item.shopImages.length > 0 && (
                   <img
