@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { Route, useLocation } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import downArrow from "../assets/downArrow.svg";
 import rightArrow from "../assets/rightArrow.svg";
@@ -246,63 +246,69 @@ const ProductDetails = () => {
           </div>
         </section>
 
-        <section className="xl:px-24 pt-10 sectionHeight">
-          <div className="flex gap-2">
-            <h3>Available Shops</h3>
-            <img className="" src={shopArrow} alt="Shop Arrow" />
-          </div>
-          <ul className="product-list-shops mt-10">
-            {products.map((item, index) => (
-              <li
-                key={item.person_id} // Use unique key
-                onClick={() => handleShopClick(item.company_id, item.person_id)}
-                className="product-item-shops"
-              >
-                <div className="product-image-shops">
-                  {item.shopImages && item.shopImages.length > 0 && (
-                    <img
-                      src={item.shopImages[0].img_url}
-                      alt={`Shop image ${index + 1}`}
-                      className="rounded-image-shops"
-                    />
-                  )}
-                </div>
-                <div className="product-details-shops mb-10">
-                  <div className="flex gap-4 text-nowrap">
-                    <p className="text-block text-[18px] font-semibold">
-                      {item.company_name}
-                    </p>
-                    <div className="flex gap-2 text-gray">
-                      <img src={carKM} />
-                      <p className="text-nowrap">
-                        {(item.distance / 1000).toFixed(1)} km away
+        {location.state.is_avalible && (
+          <section className="xl:px-24 pt-10 sectionHeight">
+            <div className="flex gap-2">
+              <h3>Available Shops</h3>
+              <img className="" src={shopArrow} alt="Shop Arrow" />
+            </div>
+            <ul className="product-list-shops mt-10">
+              {products.map((item, index) => (
+                <li
+                  key={item} // Use unique key
+                  onClick={() => handleShopClick(item.company_id, 157)}
+                  className="product-item-shops"
+                >
+                  <div className="product-image-shops">
+                    {item.shopImages && item.shopImages.length > 0 && (
+                      <img
+                        src={item.shopImages[0].img_url}
+                        alt={`Shop image ${index + 1}`}
+                        className="rounded-image-shops"
+                      />
+                    )}
+                  </div>
+                  <div className="product-details-shops mb-10">
+                    <div className="flex gap-4 text-nowrap">
+                      <p className="text-block text-[18px] font-semibold">
+                        {item.company_name}
                       </p>
+                      <div className="flex gap-2 text-gray">
+                        <img src={carKM} />
+                        <p className="text-nowrap">
+                          {parseInt(item?.distance).toFixed(1)} km away
+                          {console.log(item?.distance, "item?.distance")}
+                        </p>
+                      </div>
+                    </div>
+                    <p>{item.name}</p>
+                    <p>{item.address}</p>
+                    {/* <img src={whatsapp} /> */}
+                    {/* WhatsApp link */}
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-4 pt-2 w-[280px]"
+                    >
+                      <img className="" src={messageBTN} alt="callBTN" />
+                      <a
+                        href={whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img className="" src={whatsapp} alt="WhatsApp" />
+                      </a>
+                      <button className="flex items-center gap-1 bg-primary px-8 py-2 rounded-[26px]">
+                        <img className="" src={callBTN} alt="callBTN" />
+                        <p className="text-white">Call</p>
+                      </button>
+                      {/* <img className="" src={callBTN} alt="callBTN" /> */}
                     </div>
                   </div>
-                  <p>{item.name}</p>
-                  <p>{item.address}</p>
-                  {/* <img src={whatsapp} /> */}
-                  {/* WhatsApp link */}
-                  <div className="flex items-center gap-4 pt-2 w-[280px]">
-                    <img className="" src={messageBTN} alt="callBTN" />
-                    <a
-                      href={whatsappUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img className="" src={whatsapp} alt="WhatsApp" />
-                    </a>
-                    <button className="flex items-center gap-1 bg-primary px-8 py-2 rounded-[26px]">
-                      <img className="" src={callBTN} alt="callBTN" />
-                      <p className="text-white">Call</p>
-                    </button>
-                    {/* <img className="" src={callBTN} alt="callBTN" /> */}
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </main>
     </>
   );

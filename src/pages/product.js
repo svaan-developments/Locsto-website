@@ -128,7 +128,7 @@ const Product = () => {
                 <li key={product.item_id} className="product-item">
                   <Link
                     to={`/product/${product.item_id}`}
-                    state={{ product, products }}
+                    state={{ product, products, is_avalible: true }}
                   >
                     {product.product_images &&
                     product.product_images.length > 0 ? (

@@ -339,29 +339,19 @@ const Home = () => {
                     <li key={product.id} className="product-item">
                       <div>
                         <div className="product-images">
-                          {product.product_images &&
-                          product.product_images.length > 0 ? (
-                            product.product_images.map((image, index) => {
-                              // Only render the first image
-                              if (index === 0) {
-                                return (
-                                  <Link
-                                    to={`/product/${product.id}`}
-                                    state={{ product, products }} // Pass the products data as state
-                                    key={index}
-                                  >
-                                    <img
-                                      className="product-thumbnail"
-                                      src={product.product_images[0].img_url}
-                                      alt={product.product_images[0].type}
-                                      width={66}
-                                      height={66}
-                                    />
-                                  </Link>
-                                );
-                              }
-                              return null; // Don't render other images
-                            })
+                          {product.product_images?.length > 0 ? (
+                            <Link
+                              to={`/product/${product?.company_id}`}
+                              state={{ product, products, is_avalible: true }} // Pass the products data as state
+                            >
+                              <img
+                                className="product-thumbnail"
+                                src={product.product_images[0].img_url}
+                                alt={product.product_images[0].type}
+                                width={66}
+                                height={66}
+                              />
+                            </Link>
                           ) : (
                             <p>No images available</p>
                           )}

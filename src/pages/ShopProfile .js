@@ -118,7 +118,9 @@ const ShopProfile = () => {
   };
 
   const handleProductClick = (product) => {
-    navigate(`/product/${product.item_id}`, { state: { product, products } });
+    navigate(`/product/${product.item_id}`, {
+      state: { product, products, is_avalible: false },
+    });
   };
 
   const handleToggle = () => {
