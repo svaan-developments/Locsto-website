@@ -75,6 +75,8 @@ h3 {
   width: 100%;
   height: auto;
   max-height: 100px;
+  background: #f8f8f8;
+  border-radius: 10px;
 }
 
 .custom-gallery .image-gallery-thumbnail img {
@@ -86,7 +88,7 @@ h3 {
 .image-gallery-left-nav,
 .image-gallery-right-nav {
   padding: 50px 10px;
-  top: 50%;
+  top: 40% !important;
   transform: translateY(-25%) !important;
 }
 
@@ -100,6 +102,7 @@ h3 {
 .image-gallery-play-button {
   bottom: 0;
   padding: 0px !important;
+  margin: 15px !important;
 }
 
 .product-thumbnail {
@@ -207,7 +210,10 @@ h3 {
 }
 
 .image-gallery-content .image-gallery-slide .image-gallery-image {
-  max-height: calc(60vh - 80px) !important;
+  margin: auto;
+  /* max-height: calc(80vh - 80px) !important; */
+  padding: 50px;
+  height: 80vh;
 }
 
 .product-list-shops {
@@ -315,6 +321,32 @@ h3 {
   font-size: 0.9em;
   color: #555;
 }
+
+/* Fixed Header code */
+.header-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 94px;
+  /* background-color: #primary-color; */
+  z-index: 1000; /* Ensure it’s above other elements */
+}
+
+/* Add padding to the main content */
+.content {
+  padding-top: 94px; /* Same height as your header */
+}
+
+/* Optional: Add styles for the sections if needed */
+/* .sectionHeight {
+  min-height: 100vh;
+  padding-top: 6rem;
+} */
+
+/* .sectionPadding {
+  padding: 20px;
+} */
 
 @media only screen and (max-width: 768px) {
   /* Home page */

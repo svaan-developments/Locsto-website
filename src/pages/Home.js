@@ -21,7 +21,6 @@ const Home = () => {
   const [shops, setShops] = useState([]);
   const [mobileShops, setMobileShops] = useState([]);
   const [products, setProducts] = useState([]);
-  console.log(products, "products");
   const [loading, setLoading] = useState(false); // Add loading state
   const [error, setError] = useState(null); // Add error state
 
@@ -275,7 +274,7 @@ const Home = () => {
             <input
               type="text"
               className="search-input"
-              placeholder="Search here"
+              placeholder="Search your product here"
               value={searchText}
               onChange={handleSearchTextChange}
             />

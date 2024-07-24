@@ -12,13 +12,12 @@ import carKM from "../assets/car.svg";
 import whatsapp from "../assets/whatsapp.svg";
 import callBTN from "../assets/call_Icon.svg";
 import messageBTN from "../assets/message_Icon.svg";
+import { useNavigate } from "react-router-dom";
 
 const ProductDetails = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { product, products } = location.state || {};
-
-  console.log(products, "products detail search based");
-
   const [searchText, setSearchText] = useState("");
 
   const handleInputChange = (event) => {
@@ -74,7 +73,12 @@ const ProductDetails = () => {
       <header className="h-[94px] xl:px-24 pt-4 bg-primary heightMobile">
         <div className="xl:flex xl:justify-between items-center">
           <div className="flex xl:gap-16 items-center logoLocation">
-            <img src={logo} alt="Logo" />
+            <img
+              src={logo}
+              alt="Logo"
+              onClick={() => navigate("/")}
+              style={{ cursor: "pointer" }}
+            />
             <div className="flex items-baseline gap-2">
               <div className="text-white text-base font-medium">Location</div>
               <img src={downArrow} alt="Down Arrow" />

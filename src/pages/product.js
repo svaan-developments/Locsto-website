@@ -1,18 +1,54 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import downArrow from "../assets/downArrow.svg";
 import rightArrow from "../assets/rightArrow.svg";
 import searchIcon from "../assets/search.svg";
 import "react-image-gallery/styles/css/image-gallery.css";
+import axios from "axios";
+import search from "../assets/search.svg";
+import filter from "../assets/filter.svg";
 
 const Product = () => {
   const [searchText, setSearchText] = useState("");
   const location = useLocation();
-  const products = location.state?.products || [];
-  console.log(products, "products list");
-  const handleInputChange = (event) => {
+  const navigate = useNavigate();
+  const initialProducts = location.state?.products || [];
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [products, setProducts] = useState(initialProducts);
+
+  const handleSearchTextChange = (event) => {
     setSearchText(event.target.value);
+  };
+
+  const handleSearch = () => {
+    fetchProducts(searchText);
+  };
+
+  const fetchProducts = async (searchText) => {
+    const payload = {
+      latitude: currentLocation?.latitude || 0,
+      longitude: currentLocation?.longitude || 0,
+      brand: searchText,
+      is_new: "",
+    };
+
+    try {
+      const response = await axios.post(
+        "https://erpserver.tazk.in/locstoProduct/searchproducts?page=0&per_page=100",
+        payload
+      );
+      setProducts(response?.data?.data); // Adjust according to the actual response structure
+      console.log(response?.data?.data, "setProducts");
+
+      // Navigate to "/products" route and pass the products data
+      navigate("/products", { state: { products: response?.data?.data } });
+    } catch (error) {
+      console.error(
+        "Error fetching products: ",
+        error.response || error.message
+      );
+    }
   };
 
   // Function to parse the pic_filename field and extract image URLs
@@ -45,21 +81,32 @@ const Product = () => {
         <header className="h-[94px] xl:px-24 pt-4 bg-primary heightMobile">
           <div className="xl:flex xl:justify-between items-center">
             <div className="flex xl:gap-16 items-center logoLocation">
-              <img src={logo} alt="Logo" />
+              <img
+                src={logo}
+                alt="Logo"
+                onClick={() => navigate("/")}
+                style={{ cursor: "pointer" }}
+              />
               <div className="flex items-baseline gap-2">
                 <div className="text-white text-base font-medium">Location</div>
                 <img src={downArrow} alt="Down Arrow" />
               </div>
             </div>
             <div className="search-container-product">
+              <img src={search} alt="Search" />
               <input
                 type="text"
                 className="search-input"
-                placeholder="Search here"
+                placeholder="Search your product here"
                 value={searchText}
-                onChange={handleInputChange}
+                onChange={handleSearchTextChange}
               />
-              <img src={searchIcon} alt="Search Icon" />
+              <img
+                src={filter}
+                className="pr-2"
+                alt="Filter"
+                onClick={handleSearch}
+              />
             </div>
             <div className="loginPadding">
               <button className="flex justify-center items-center w-[134px] h-[54px] bg-white gap-2 rounded-[100px] loginMobile">

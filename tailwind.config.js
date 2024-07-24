@@ -11,6 +11,7 @@ module.exports = {
         Neutral: "#312234",
         block: "#1C1C1E",
         white: "#ffffff",
+        DarkGray: "#878787",
       },
       flexBasis: {
         50: "50%",
