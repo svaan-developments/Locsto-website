@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Route, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import downArrow from "../assets/downArrow.svg";
 import rightArrow from "../assets/rightArrow.svg";
 import shopArrow from "../assets/shopArrow.svg";
-import searchIcon from "../assets/search.svg";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
-import { Link } from "react-router-dom";
 import carKM from "../assets/car.svg";
 import whatsapp from "../assets/whatsapp.svg";
 import callBTN from "../assets/call_Icon.svg";
@@ -17,6 +15,7 @@ import axios from "axios";
 import search from "../assets/search.svg";
 import filter from "../assets/filter.svg";
 import BackArrow from "../assets/BackArrow.svg";
+import { ApiEndPoints, Constants } from "../Environment";
 
 const ProductDetails = () => {
   const location = useLocation();
@@ -45,13 +44,11 @@ const ProductDetails = () => {
 
     try {
       const response = await axios.post(
-        "https://erpserver.tazk.in/locstoProduct/searchproducts?page=0&per_page=100",
+        Constants.BaseURL_Product + ApiEndPoints.Seacrch_products,
         payload
       );
       setProducts(response?.data?.data); // Adjust according to the actual response structure
       console.log(response?.data?.data, "setProducts");
-
-      // Navigate to "/products" route and pass the products data
       navigate("/products", { state: { products: response?.data?.data } });
     } catch (error) {
       console.error(
@@ -105,23 +102,16 @@ const ProductDetails = () => {
     ? `https://wa.me/${phoneNumber}`
     : `https://web.whatsapp.com/send?phone=${phoneNumber}`;
 
-  // const handleShopClick = (companyId, userId) => {
-  //   const shop = products.find((shop) => shop.company_id === companyId);
-  //   if (shop) {
-  //     navigate(`/shop/${companyId}/${userId}`, { state: { shop } });
-  //   } else {
-  //     console.error(`Shop with companyId ${companyId} not found in products.`);
-  //   }
-  // };
   const handleShopClick = async (companyId, personId) => {
     try {
-      const response = await axios.post(
-        `https://erpserver.tazk.in/locstoUser/companyProfile/${companyId}/${personId}`,
-        {
-          latitude: 12.001,
-          longitude: 14.001,
-        }
-      );
+      const url = `${Constants.BaseURL}${ApiEndPoints.getCompanyProfile(
+        companyId,
+        personId
+      )}`;
+      const response = await axios.post(url, {
+        latitude: 12.001,
+        longitude: 14.001,
+      });
       console.log("Shop Profile Response:", response?.data); // Log the response data
       console.log("personId", personId); // Log the response data
 
@@ -162,7 +152,7 @@ const ProductDetails = () => {
               onClick={() => navigate("/")}
               style={{ cursor: "pointer" }}
             />
-            <div className="flex items-baseline gap-2">
+            <div className="flex items-baseline gap-2 cursor-pointer">
               <div className="text-white text-base font-medium">Location</div>
               <img src={downArrow} alt="Down Arrow" />
             </div>
@@ -178,7 +168,7 @@ const ProductDetails = () => {
             />
             <img
               src={filter}
-              className="pr-2"
+              className="pr-2 cursor-pointer"
               alt="Filter"
               onClick={handleSearch}
             />
@@ -193,12 +183,6 @@ const ProductDetails = () => {
       </header>
 
       <main className="content">
-        {/* <sectiom>
-          <button className="flex items-center gap-4">
-            <img src={BackArrow} />
-            <p>Back</p>
-          </button>
-        </sectiom> */}
         <section className="px-4 md:px-8 lg:px-16 xl:px-24 pt-10">
           <button
             onClick={handleBackClick}
@@ -209,7 +193,6 @@ const ProductDetails = () => {
           </button>
           <div className="flex flex-col gap-10 xl:flex-row">
             <div className="xl:w-1/2 sectionHeight mb-6 xl:mb-0 xl:mr-6">
-              {/* <h3 className="text-2xl font-bold mb-4">{product.name}</h3> */}
               {product.product_images && product.product_images.length > 0 ? (
                 <ImageGallery
                   items={getProductImages(product.product_images)}
@@ -241,7 +224,6 @@ const ProductDetails = () => {
               <p className="font-bold text-Neutral text-[40px] mb-2">
                 RS {product.unit_price}
               </p>
-              {/* <p className="mb-2">Max Price: {product.max_price}</p> */}
             </div>
           </div>
         </section>
@@ -257,7 +239,7 @@ const ProductDetails = () => {
                 <li
                   key={item} // Use unique key
                   onClick={() => handleShopClick(item.company_id, 157)}
-                  className="product-item-shops"
+                  className="product-item-shops cursor-pointer"
                 >
                   <div className="product-image-shops">
                     {item.shopImages && item.shopImages.length > 0 && (
@@ -276,15 +258,13 @@ const ProductDetails = () => {
                       <div className="flex gap-2 text-gray">
                         <img src={carKM} />
                         <p className="text-nowrap">
-                          {parseInt(item?.distance).toFixed(1)} km away
+                          {parseInt(item?.distance).toFixed(1)} km
                           {console.log(item?.distance, "item?.distance")}
                         </p>
                       </div>
                     </div>
                     <p>{item.name}</p>
                     <p>{item.address}</p>
-                    {/* <img src={whatsapp} /> */}
-                    {/* WhatsApp link */}
                     <div
                       onClick={(e) => e.stopPropagation()}
                       className="flex items-center gap-4 pt-2 w-[280px]"
@@ -301,7 +281,6 @@ const ProductDetails = () => {
                         <img className="" src={callBTN} alt="callBTN" />
                         <p className="text-white">Call</p>
                       </button>
-                      {/* <img className="" src={callBTN} alt="callBTN" /> */}
                     </div>
                   </div>
                 </li>

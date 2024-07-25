@@ -7,51 +7,18 @@ import rightArrow from "../assets/rightArrow.svg";
 import downArrow from "../assets/downArrow.svg";
 import search from "../assets/search.svg";
 import filter from "../assets/filter.svg";
-import Select from "react-select";
-import { FaMapMarkerAlt } from "react-icons/fa";
 import location from "../assets/location.svg";
 import { Link } from "react-router-dom";
+import { ApiEndPoints, Constants } from "../Environment";
 
 const Home = () => {
-  const navigate = useNavigate(); // Initialize useNavigate hook
-
-  const [selectedLocation, setSelectedLocation] = useState(null);
+  const navigate = useNavigate();
   const [currentLocation, setCurrentLocation] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [shops, setShops] = useState([]);
   const [mobileShops, setMobileShops] = useState([]);
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false); // Add loading state
-  const [error, setError] = useState(null); // Add error state
-
-  const locations = [
-    {
-      value: "velachery",
-      label: "Velachery",
-      latitude: 12.9762,
-      longitude: 80.2216,
-    },
-    { value: "omr", label: "OMR", latitude: 12.8434, longitude: 80.1514 },
-    {
-      value: "perungudi",
-      label: "Perungudi",
-      latitude: 12.96,
-      longitude: 80.2394,
-    },
-    { value: "trichy", label: "Trichy", latitude: 10.7905, longitude: 78.7047 },
-    // Add more cities or regions in Tamil Nadu as needed
-  ];
-
-  const handleSelectChange = (selectedOption) => {
-    setSelectedLocation(selectedOption);
-    // Fetch shops for the selected location
-    if (selectedOption) {
-      const selectedLoc = locations.find(
-        (loc) => loc.value === selectedOption.value
-      );
-      fetchShops(selectedLoc.latitude, selectedLoc.longitude);
-    }
-  };
+  const [error, setError] = useState(null);
 
   const handleSearchTextChange = (event) => {
     setSearchText(event.target.value);
@@ -63,7 +30,6 @@ const Home = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
           setCurrentLocation({ latitude, longitude });
-          // Trigger fetching shops when location is fetched
           fetchShops(latitude, longitude);
         },
         (error) => {
@@ -81,16 +47,15 @@ const Home = () => {
       longitude,
       kms: 10,
     };
-
     try {
       const response = await axios.post(
-        "https://erpserver.tazk.in/locstoUser/nearbyshops",
+        Constants.BaseURL + ApiEndPoints.nearbyshops,
         payload
       );
-      setShops(response.data); // Adjust according to the actual response structure
+      setShops(response.data);
       // Filter mobile shops
       const filteredMobileShops = response.data.filter(
-        (shop) => shop.company_type === 1 // Assuming company_type 1 means mobile shops
+        (shop) => shop.company_type === 1
       );
       setMobileShops(filteredMobileShops);
     } catch (error) {
@@ -105,16 +70,13 @@ const Home = () => {
       brand: searchText,
       is_new: "",
     };
-
     try {
       const response = await axios.post(
-        "https://erpserver.tazk.in/locstoProduct/searchproducts?page=0&per_page=100",
+        Constants.BaseURL_Product + ApiEndPoints.Seacrch_products,
         payload
       );
-      setProducts(response?.data?.data); // Adjust according to the actual response structure
+      setProducts(response?.data?.data);
       console.log(response?.data?.data, "setProducts");
-
-      // Navigate to "/products" route and pass the products data
       navigate("/products", { state: { products: response?.data?.data } });
     } catch (error) {
       console.error(
@@ -127,9 +89,8 @@ const Home = () => {
   const fetchTrendingProducts = async () => {
     try {
       const response = await axios.get(
-        "https://erpserver.tazk.in/locstoProduct/trending?user_id=&page=0&per_page=100"
+        Constants.BaseURL_Product + ApiEndPoints.Trending_Products
       );
-      // Assuming response.data contains 'data' field with products array
       setProducts(response.data || []);
     } catch (error) {
       console.error(
@@ -147,27 +108,16 @@ const Home = () => {
     fetchProducts(searchText);
   };
 
-  // const handleShopClick = (companyId, userId) => {
-  //   const shop = mobileShops.find((shop) => shop.company_id === companyId);
-  //   if (shop) {
-  //     // Navigate to shop details page and pass shop object as state
-  //     navigate(`/shop/${companyId}/${userId}`, { state: { shop } });
-  //   } else {
-  //     console.error(
-  //       `Shop with companyId ${companyId} not found in mobileShops.`
-  //     );
-  //   }
-  // };
-
   const handleShopClick = async (companyId, personId) => {
     try {
-      const response = await axios.post(
-        `https://erpserver.tazk.in/locstoUser/companyProfile/${companyId}/${personId}`,
-        {
-          latitude: 12.001,
-          longitude: 14.001,
-        }
-      );
+      const url = `${Constants.BaseURL}${ApiEndPoints.getCompanyProfile(
+        companyId,
+        personId
+      )}`;
+      const response = await axios.post(url, {
+        latitude: 12.001,
+        longitude: 14.001,
+      });
       console.log("Shop Profile Response:", response?.data); // Log the response data
 
       if (response?.data) {
@@ -193,61 +143,13 @@ const Home = () => {
     }
   };
 
-  const fetchShopProducts = async (companyId) => {
-    try {
-      const response = await axios.post(
-        `https://erpserver.tazk.in/locstoProduct/items/${companyId}?page=0&per_page=100`,
-        {
-          categories: ["SMARTPHONE"],
-        }
-      );
-      console.log("Shop Products Response:", response.data.data);
-      setProducts(response.data.data || []); // Ensure to set an empty array if response.data.data is undefined
-      setLoading(false);
-    } catch (error) {
-      console.error(
-        "Error fetching shop products: ",
-        error.response || error.message
-      );
-      setError("Error fetching shop products. Please try again later.");
-      setLoading(false);
-    }
-  };
-
-  // useEffect(() => {
-  //   if (shop && shop.company_id) {
-  //     fetchShopProducts(shop.company_id); // Fetch products when shop details are available
-  //   } else {
-  //     setError("Shop information is not available.");
-  //     setLoading(false);
-  //   }
-  // }, [shop]);
-
   return (
     <>
       <div>
         <header className="h-[269px] xl:px-24 pt-4 bg bg-cover bg-center bg-no-repeat bannerMobile">
           <div className="flex xl:justify-between items-center headerMobile">
             <div className="flex xl:gap-16 items-center locationMobile">
-              <img src={logo} alt="Logo" />
-              {/* <div>
-                <button
-                  className="flex items-center gap-4 bg-white px-4 py-1 rounded-lg"
-                  onClick={fetchCurrentLocation}
-                  onTouchStart={fetchCurrentLocation} // Add onTouchStart event
-                >
-                  <FaMapMarkerAlt className="bg-white" />
-                  Location
-                </button>
-                {currentLocation && (
-                  <div className="bg-white">
-                    <p>
-                      Current Location: {currentLocation.latitude},{" "}
-                      {currentLocation.longitude}
-                    </p>
-                  </div>
-                )}
-              </div> */}
+              <img className="cursor-pointer" src={logo} alt="Logo" />
               <div
                 onClick={fetchCurrentLocation}
                 onTouchStart={fetchCurrentLocation}
@@ -280,7 +182,7 @@ const Home = () => {
             />
             <img
               src={filter}
-              className="pr-2"
+              className="pr-2 cursor-pointer"
               alt="Filter"
               onClick={handleSearch}
             />
@@ -295,6 +197,7 @@ const Home = () => {
               <ul className="shop-list pt-6">
                 {shops.map((shop) => (
                   <li
+                    className="cursor-pointer"
                     key={shop.person_id}
                     onClick={() =>
                       handleShopClick(shop.company_id, shop.person_id)

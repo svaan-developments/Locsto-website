@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import Product from "./pages/product";
 import ProductDetails from "./pages/productdetails";
 import ShopProfile from "./pages/ShopProfile ";
-import ShopProductDetails from "./pages/ShopProductDetails";
+
 function App() {
   return (
     <>
@@ -18,10 +18,6 @@ function App() {
             <Route
               path="/shopProfile/:companyId/:personId"
               element={<ShopProfile />}
-            />
-            <Route
-              path="/product/:productId"
-              element={<ShopProductDetails />}
             />
           </Route>
         </Routes>

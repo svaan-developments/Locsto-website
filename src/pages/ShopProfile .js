@@ -3,7 +3,6 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import downArrow from "../assets/downArrow.svg";
-import searchIcon from "../assets/search.svg";
 import rightArrow from "../assets/rightArrow.svg";
 import shopArrow from "../assets/shopArrow.svg";
 import AddressIcon from "../assets/addressIcon.svg";
@@ -15,6 +14,7 @@ import Gmail from "../assets/Gmail.svg";
 import WhatsappIcon from "../assets/whatsappIcon.svg";
 import search from "../assets/search.svg";
 import filter from "../assets/filter.svg";
+import { ApiEndPoints, Constants } from "../Environment";
 
 const ShopProfile = () => {
   const [searchText, setSearchText] = useState("");
@@ -49,13 +49,11 @@ const ShopProfile = () => {
 
     try {
       const response = await axios.post(
-        "https://erpserver.tazk.in/locstoProduct/searchproducts?page=0&per_page=100",
+        Constants.BaseURL_Product + ApiEndPoints.Seacrch_products,
         payload
       );
       setProducts(response?.data?.data); // Adjust according to the actual response structure
       console.log(response?.data?.data, "setProducts");
-
-      // Navigate to "/products" route and pass the products data
       navigate("/products", { state: { products: response?.data?.data } });
     } catch (error) {
       console.error(
@@ -75,12 +73,12 @@ const ShopProfile = () => {
     const fetchShopProducts = async () => {
       if (companyId) {
         try {
-          const response = await axios.post(
-            `https://erpserver.tazk.in/locstoProduct/items/${companyId}?page=0&per_page=100`,
-            {
-              categories: ["SMARTPHONE"],
-            }
-          );
+          const url = `${Constants.BaseURL_Product}${ApiEndPoints.getItemsUrl(
+            companyId
+          )}`;
+          const response = await axios.post(url, {
+            categories: ["SMARTPHONE"],
+          });
           setProducts(response.data || []);
         } catch (error) {
           setError("Error fetching shop products. Please try again later.");
@@ -88,10 +86,6 @@ const ShopProfile = () => {
           setLoading(false);
         }
       }
-      // else {
-      //   setError("Shop information is not available.");
-      //   setLoading(false);
-      // }
     };
 
     fetchShopProducts();
@@ -100,10 +94,9 @@ const ShopProfile = () => {
   const handleFollow = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const response = await axios.post(
-        "https://erpserver.tazk.in/locstoUser/follow/?type=follow",
+        Constants.BaseURL + ApiEndPoints.Follow_profile,
         {
           following_id: userId,
           followed_id: companyId,
@@ -154,7 +147,7 @@ const ShopProfile = () => {
               onClick={() => navigate("/")}
               style={{ cursor: "pointer" }}
             />
-            <div className="flex items-baseline gap-2">
+            <div className="flex items-baseline gap-2 cursor-pointer">
               <div className="text-white text-base font-medium">Location</div>
               <img src={downArrow} alt="Down Arrow" />
             </div>
@@ -170,7 +163,7 @@ const ShopProfile = () => {
             />
             <img
               src={filter}
-              className="pr-2"
+              className="pr-2 cursor-pointer"
               alt="Filter"
               onClick={handleSearch}
             />
@@ -191,7 +184,6 @@ const ShopProfile = () => {
               <img
                 src={shopProfile[0].shopImages[0].img_url}
                 alt={shopProfile[0].shopImages[0].img_name}
-                // className={shopProfile[0].shopImages[0].thumbnail ? "thumbnail-class" : "regular-class"}
                 style={{
                   width: "100%",
                   height: "300px",
@@ -208,7 +200,6 @@ const ShopProfile = () => {
                 <p className="text-primary font-semibold text-[24px]">
                   {shopProfile[0]?.company_name}
                 </p>
-                {/* <p className="">{shopProfile[0]?.address}</p> */}
                 <div className="flex gap-2">
                   <img src={Member} />
                   <p>Member since Dec 2023</p>
@@ -252,9 +243,9 @@ const ShopProfile = () => {
               <div>
                 <p>User verified with you</p>
                 <div className="flex gap-4">
-                  <img src={Google} />
-                  <img src={Gmail} />
-                  <img src={WhatsappIcon} />
+                  <img className="cursor-pointer" src={Google} />
+                  <img className="cursor-pointer" src={Gmail} />
+                  <img className="cursor-pointer" src={WhatsappIcon} />
                 </div>
               </div>
               <div>
@@ -289,6 +280,7 @@ const ShopProfile = () => {
               <ul className="product-list-container pt-6">
                 {products.map((product) => (
                   <li
+                    className="cursor-pointer"
                     key={product.item_id}
                     onClick={() => handleProductClick(product)}
                   >

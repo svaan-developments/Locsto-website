@@ -3,11 +3,11 @@ import { useLocation, Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import downArrow from "../assets/downArrow.svg";
 import rightArrow from "../assets/rightArrow.svg";
-import searchIcon from "../assets/search.svg";
 import "react-image-gallery/styles/css/image-gallery.css";
 import axios from "axios";
 import search from "../assets/search.svg";
 import filter from "../assets/filter.svg";
+import { ApiEndPoints, Constants } from "../Environment";
 
 const Product = () => {
   const [searchText, setSearchText] = useState("");
@@ -35,7 +35,7 @@ const Product = () => {
 
     try {
       const response = await axios.post(
-        "https://erpserver.tazk.in/locstoProduct/searchproducts?page=0&per_page=100",
+        Constants.BaseURL_Product + ApiEndPoints.Seacrch_products,
         payload
       );
       setProducts(response?.data?.data); // Adjust according to the actual response structure
@@ -148,7 +148,6 @@ const Product = () => {
                     <p className="text-secondary font-bold text-[20px]">
                       Rs. {product.unit_price}
                     </p>
-                    {/* <p>Max Price: {product.max_price}</p> */}
                   </Link>
                 </li>
               ))}
