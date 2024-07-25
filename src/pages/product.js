@@ -77,86 +77,87 @@ const Product = () => {
 
   return (
     <>
-      <div>
-        <header className="h-[94px] xl:px-24 pt-4 bg-primary heightMobile">
-          <div className="xl:flex xl:justify-between items-center">
-            <div className="flex xl:gap-16 items-center logoLocation">
-              <img
-                src={logo}
-                alt="Logo"
-                onClick={() => navigate("/")}
-                style={{ cursor: "pointer" }}
-              />
-              <div className="flex items-baseline gap-2">
-                <div className="text-white text-base font-medium">Location</div>
-                <img src={downArrow} alt="Down Arrow" />
-              </div>
-            </div>
-            <div className="search-container-product">
-              <img src={search} alt="Search" />
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search your product here"
-                value={searchText}
-                onChange={handleSearchTextChange}
-              />
-              <img
-                src={filter}
-                className="pr-2"
-                alt="Filter"
-                onClick={handleSearch}
-              />
-            </div>
-            <div className="loginPadding">
-              <button className="flex justify-center items-center w-[134px] h-[54px] bg-white gap-2 rounded-[100px] loginMobile">
-                <a className="text-base font-semibold uppercase">Login</a>
-                <img src={rightArrow} alt="Right Arrow" />
-              </button>
+      {/* <div> */}
+      <header className="header-fixed h-[94px] xl:px-24 pt-4 bg-primary heightMobile">
+        <div className="xl:flex xl:justify-between items-center">
+          <div className="flex xl:gap-16 items-center logoLocation">
+            <img
+              src={logo}
+              alt="Logo"
+              onClick={() => navigate("/")}
+              style={{ cursor: "pointer" }}
+            />
+            <div className="flex items-baseline gap-2">
+              <div className="text-white text-base font-medium">Location</div>
+              <img src={downArrow} alt="Down Arrow" />
             </div>
           </div>
-        </header>
-      </div>
-
-      {/* Display Products Passed from Home Component */}
-      <section className="xl:px-24 pt-10">
-        <div>
-          <h3 className="py-4">Result for</h3>
-          {products.length > 0 ? (
-            <ul className="product-list">
-              {products.map((product) => (
-                <li key={product.item_id} className="product-item">
-                  <Link
-                    to={`/product/${product.item_id}`}
-                    state={{ product, products, is_avalible: true }}
-                  >
-                    {product.product_images &&
-                    product.product_images.length > 0 ? (
-                      <img
-                        src={
-                          getProductImages(product.product_images)[0].original
-                        }
-                        alt={product.name}
-                        className="product-thumbnail"
-                      />
-                    ) : (
-                      <p>No image available</p>
-                    )}
-                    <h4 className="text-secondary font-medium text-[18px] py-2 flex-wrap w-[190px]">
-                      {product.name}
-                    </h4>
-                    <p className="text-secondary font-bold text-[20px]">
-                      Rs. {product.unit_price}
-                    </p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No products found</p>
-          )}
+          <div className="search-container-product">
+            <img src={search} alt="Search" />
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search your product here"
+              value={searchText}
+              onChange={handleSearchTextChange}
+            />
+            <img
+              src={filter}
+              className="pr-2"
+              alt="Filter"
+              onClick={handleSearch}
+            />
+          </div>
+          <div className="loginPadding">
+            <button className="flex justify-center items-center w-[134px] h-[54px] bg-white gap-2 rounded-[100px] loginMobile">
+              <a className="text-base font-semibold uppercase">Login</a>
+              <img src={rightArrow} alt="Right Arrow" />
+            </button>
+          </div>
         </div>
-      </section>
+      </header>
+      {/* </div> */}
+      <main className="content mobile-product">
+        {/* Display Products Passed from Home Component */}
+        <section className="xl:px-24 pt-10">
+          <div>
+            <h3 className="py-4">Result for</h3>
+            {products.length > 0 ? (
+              <ul className="product-list">
+                {products.map((product) => (
+                  <li key={product.item_id} className="product-item">
+                    <Link
+                      to={`/product/${product.item_id}`}
+                      state={{ product, products, is_avalible: true }}
+                    >
+                      {product.product_images &&
+                      product.product_images.length > 0 ? (
+                        <img
+                          src={
+                            getProductImages(product.product_images)[0].original
+                          }
+                          alt={product.name}
+                          className="product-thumbnail"
+                        />
+                      ) : (
+                        <p>No image available</p>
+                      )}
+                      <h4 className="text-secondary font-medium text-[18px] py-2 flex-wrap w-[190px]">
+                        {product.name}
+                      </h4>
+                      <p className="text-secondary font-bold text-[20px]">
+                        Rs. {product.unit_price}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No products found</p>
+            )}
+          </div>
+        </section>
+      </main>
     </>
   );
 };
